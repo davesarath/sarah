@@ -1,0 +1,62 @@
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.navbar .nav-link {
+  font-size: 0.95rem;
+  margin-right: 0.5rem;
+}
+
+
+.sidebar {
+  background: #fff;
+  border-right: 1px solid #ddd;
+  min-height: 100vh;
+}
+
+.sidebar .nav-link {
+  color: #333;
+  padding: 10px 15px;
+}
+
+.sidebar .nav-link.active {
+  background-color: #dc3545;
+  color: #fff;
+  border-radius: 8px;
+}
+
+
+.login-card {
+  background: #fff url('../assets/images/pets-bg.jpg') no-repeat center center / cover;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.login-card .card-body {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+
+.btn-custom {
+  background-color: #dc3545;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  transition: 0.3s;
+}
+
+.btn-custom:hover {
+  background-color: #bb2d3b;
+}

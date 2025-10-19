@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment - Pet Care Management</title>
+ 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fa;
+      padding: 30px;
+    }
+    .booking-card {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      padding: 2rem;
+    }
+    .card-header {
+      background: #00b4d8;
+      color: white;
+      border-radius: 15px 15px 0 0;
+      text-align: center;
+      padding: 15px;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="booking-card">
+    <div class="card-header">
+      <i class="bi bi-calendar-check"></i> Book Appointment
+    </div>
+    <div class="card-body">
+      <form action="book.php" method="POST">
+        
+       
+        <div class="mb-3">
+          <label for="petName" class="form-label">Select Pet</label>
+          <select id="petName" name="pet_id" class="form-select" required>
+            <option value="">-- Choose Pet --</option>
+            <option value="1">Buddy (Dog)</option>
+            <option value="2">Luna (Cat)</option>
+            
+          </select>
+        </div>
+
+      
+        <div class="mb-3">
+          <label for="serviceType" class="form-label">Service Type</label>
+          <select id="serviceType" name="service_type" class="form-select" required>
+            <option value="">-- Choose Service --</option>
+            <option value="vet">Veterinary Checkup</option>
+            <option value="grooming">Grooming</option>
+            <option value="training">Training</option>
+          </select>
+        </div>
+
+       
+        <div class="mb-3">
+          <label for="date" class="form-label">Appointment Date</label>
+          <input type="date" id="date" name="appointment_date" class="form-control" required>
+        </div>
+
+       
+        <div class="mb-3">
+          <label for="time" class="form-label">Preferred Time</label>
+          <input type="time" id="time" name="appointment_time" class="form-control" required>
+        </div>
+
+       
+        <div class="mb-3">
+          <label for="notes" class="form-label">Additional Notes</label>
+          <textarea id="notes" name="notes" rows="3" class="form-control"></textarea>
+        </div>
+
+        
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Confirm Booking
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+  <footer class="bg-light text-center text-dark border-top mt-5 py-3">
+    <div class="container">
+      <p class="mb-1">
+        <strong>Contact Us:</strong> 
+        <a href="mailto:support@petcare.com" class="text-decoration-none text-primary">support@petcare.com</a> |
+        <a href="tel:+919876543210" class="text-decoration-none text-primary">+91 98765 43210</a>
+      </p>
+      <p class="small mb-0 text-muted">&copy; 2025 Pet Care Management System. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
