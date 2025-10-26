@@ -1,0 +1,98 @@
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+
+.admin-sidebar {
+  width: 250px;
+  background: #343a40;
+  color: #fff;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+}
+
+.admin-sidebar .nav-link {
+  color: #ddd;
+  padding: 12px 20px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+  background: #dc3545;
+  color: #fff;
+  border-radius: 6px;
+}
+
+
+.admin-content {
+  flex: 1;
+  background: #f8f9fa;
+  padding: 2rem;
+}
+
+
+.admin-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.admin-card:hover {
+  transform: translateY(-3px);
+}
+
+.admin-card h5 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #dc3545;
+}
+
+.admin-card p {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+
+.admin-table th {
+  background: #dc3545;
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-table tr:hover {
+  background: #f1f1f1;
+}
+
+
+.admin-navbar {
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-navbar h4 {
+  font-weight: 600;
+  margin: 0;
+}
+
+.admin-navbar .btn-logout {
+  background: #dc3545;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.4rem 1rem;
+}
+
+.admin-navbar .btn-logout:hover {
+  background: #bb2d3b;
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Settings - Pet Care System</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="admin.html">Admin Dashboard</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
+
+  
+  <div class="container mt-5">
+    <h2 class="mb-4 text-center">⚙️ Admin Settings</h2>
+
+    <div class="row g-4">
+  
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            Update Profile
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="mb-3">
+                <label for="adminName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="adminName" placeholder="Enter your name">
+              </div>
+              <div class="mb-3">
+                <label for="adminEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="adminEmail" placeholder="Enter your email">
+              </div>
+              <div class="mb-3">
+                <label for="adminPhone" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="adminPhone" placeholder="Enter your phone">
+              </div>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+  
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            Change Password
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="mb-3">
+                <label for="currentPassword" class="form-label">Current Password</label>
+                <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+              </div>
+              <div class="mb-3">
+                <label for="newPassword" class="form-label">New Password</label>
+                <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+              </div>
+              <button type="submit" class="btn btn-warning">Update Password</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+  
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            System Preferences
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="mb-3">
+                <label class="form-label">Theme</label>
+                <select class="form-select">
+                  <option selected>Light Mode</option>
+                  <option>Dark Mode</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Notification Preferences</label><br>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                  <label class="form-check-label" for="emailNotif">Email</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="smsNotif">
+                  <label class="form-check-label" for="smsNotif">SMS</label>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-success">Save Preferences</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <footer class="bg-dark text-white text-center p-3 mt-5">
+    <p>&copy; 2025 Pet Care Management System. All Rights Reserved.</p>
+  </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

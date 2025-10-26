@@ -1,0 +1,54 @@
+<!-- includes/sidebar.html -->
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 250px; height: 100vh; position: fixed;">
+  <a href="admin.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+    <i class="bi bi-heart-fill me-2 text-danger"></i>
+    <span class="fs-5 fw-bold">Pet Care</span>
+  </a>
+  <hr>
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+      <a href="admin.html" class="nav-link active" aria-current="page">
+        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="owner.html" class="nav-link link-dark">
+        <i class="bi bi-paw me-2"></i> Pets
+      </a>
+    </li>
+    <li>
+      <a href="#medicalSubmenu" class="nav-link link-dark" data-bs-toggle="collapse" aria-expanded="false">
+        <i class="bi bi-capsule me-2"></i> Medical
+      </a>
+      <ul class="collapse list-unstyled ms-3" id="medicalSubmenu">
+        <li><a href="add.html" class="nav-link link-dark">Add Record</a></li>
+        <li><a href="vaccinations.html" class="nav-link link-dark">Vaccinations</a></li>
+        <li><a href="medications.html" class="nav-link link-dark">Medications</a></li>
+        <li><a href="upcoming.html" class="nav-link link-dark">Upcoming</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="calendar.html" class="nav-link link-dark">
+        <i class="bi bi-calendar-event me-2"></i> Calendar
+      </a>
+    </li>
+    <li>
+      <a href="list.html" class="nav-link link-dark">
+        <i class="bi bi-list-task me-2"></i> Records
+      </a>
+    </li>
+  </ul>
+  <hr>
+  <div class="dropdown">
+    <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+      <img src="https://cdn-icons-png.flaticon.com/512/194/194938.png" alt="" width="32" height="32" class="rounded-circle me-2">
+      <strong>Admin</strong>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser">
+      <li><a class="dropdown-item" href="#">Profile</a></li>
+      <li><a class="dropdown-item" href="#">Settings</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="index.html"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>

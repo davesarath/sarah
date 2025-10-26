@@ -1,0 +1,53 @@
+<!-- includes/navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold" href="index.html">
+      <i class="bi bi-heart-fill text-danger me-2"></i> Pet Care
+    </a>
+
+    <!-- Toggle button for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Menu items -->
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="index.html"><i class="bi bi-house-door me-1"></i> Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="calendar.html"><i class="bi bi-calendar-event me-1"></i> Calendar</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="list.html"><i class="bi bi-list-task me-1"></i> Records</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-capsule me-1"></i> Medical
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="add.html">Add Record</a></li>
+            <li><a class="dropdown-item" href="vaccinations.html">Vaccinations</a></li>
+            <li><a class="dropdown-item" href="medications.html">Medications</a></li>
+            <li><a class="dropdown-item" href="upcoming.html">Upcoming</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="owner.html"><i class="bi bi-paw me-1"></i> Pets</a>
+        </li>
+      </ul>
+
+      <!-- Right-side buttons -->
+      <ul class="navbar-nav ms-3">
+        <li class="nav-item">
+          <a class="btn btn-outline-light btn-sm me-2" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-danger btn-sm" href="register.html"><i class="bi bi-person-plus"></i> Register</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
