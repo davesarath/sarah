@@ -1,107 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Appointment - Pet Care Management</title>
- 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    body {
-      background: #f8f9fa;
-      padding: 30px;
-    }
-    .booking-card {
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      padding: 2rem;
-    }
-    .card-header {
-      background: #00b4d8;
-      color: white;
-      border-radius: 15px 15px 0 0;
-      text-align: center;
-      padding: 15px;
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
+{% extends "layouts/owner_base.html" %}
 
-  <div class="booking-card">
-    <div class="card-header">
-      <i class="bi bi-calendar-check"></i> Book Appointment
-    </div>
-    <div class="card-body">
-      <form action="book.php" method="POST">
-        
-       
-        <div class="mb-3">
-          <label for="petName" class="form-label">Select Pet</label>
-          <select id="petName" name="pet_id" class="form-select" required>
-            <option value="">-- Choose Pet --</option>
-            <option value="1">Buddy (Dog)</option>
-            <option value="2">Luna (Cat)</option>
-            
-          </select>
+{% block title %}Pet Care Management - Book Appointment{% endblock %}
+
+{% block page_title %}📅 Book Appointment{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <form action="/book_appointment" method="POST">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Select Pet</label>
+            <select class="form-select" name="pet_id" required>
+              <option value="">Choose your pet...</option>
+              {% for pet in pets %}
+                    <option value="{{ pet.pet_id }}" 
+                      {% if pet_id|string == pet.pet_id|string %}selected{% endif %}>
+                      {{ pet.name }} ({{ pet.breed }})
+                    </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Veterinarian</label>
+            <input type="text" id="vetSearch" class="form-control" placeholder="Search veterinarian..." autocomplete="off" required>
+            <input type="hidden" id="vet_id" name="vet_id"  value="{{ vet_id or '' }}" required>
+            <ul id="vetSuggestions" class="list-group position-absolute w-100" style="z-index:1000;"></ul>
+          </div>
         </div>
 
-      
-        <div class="mb-3">
-          <label for="serviceType" class="form-label">Service Type</label>
-          <select id="serviceType" name="service_type" class="form-select" required>
-            <option value="">-- Choose Service --</option>
-            <option value="vet">Veterinary Checkup</option>
-            <option value="grooming">Grooming</option>
-            <option value="training">Training</option>
-          </select>
-        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Appointment Date</label>
+            <input type="date" class="form-control" name="appointment_date"  value="{{ appointment_date or '' }}" required>
+          </div>
 
-       
-        <div class="mb-3">
-          <label for="date" class="form-label">Appointment Date</label>
-          <input type="date" id="date" name="appointment_date" class="form-control" required>
+          <div class="mb-3">
+            <label class="form-label">Appointment Time</label>
+            <input type="time" class="form-control" name="appointment_time"  value="{{ appointment_time or '' }}" required>
+          </div>
         </div>
+      </div>
 
-       
-        <div class="mb-3">
-          <label for="time" class="form-label">Preferred Time</label>
-          <input type="time" id="time" name="appointment_time" class="form-control" required>
-        </div>
-
-       
-        <div class="mb-3">
-          <label for="notes" class="form-label">Additional Notes</label>
-          <textarea id="notes" name="notes" rows="3" class="form-control"></textarea>
-        </div>
-
-        
-        <div class="d-grid">
-          <button type="submit" class="btn btn-success">
-            <i class="bi bi-check-circle"></i> Confirm Booking
-          </button>
-        </div>
-
-      </form>
-    </div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Book Appointment</button>
+        <a href="/appointments" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
   </div>
-  <footer class="bg-light text-center text-dark border-top mt-5 py-3">
-    <div class="container">
-      <p class="mb-1">
-        <strong>Contact Us:</strong> 
-        <a href="mailto:support@petcare.com" class="text-decoration-none text-primary">support@petcare.com</a> |
-        <a href="tel:+919876543210" class="text-decoration-none text-primary">+91 98765 43210</a>
-      </p>
-      <p class="small mb-0 text-muted">&copy; 2025 Pet Care Management System. All rights reserved.</p>
-    </div>
-  </footer>
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const vetInput = document.getElementById("vetSearch");
+    const vetSuggestions = document.getElementById("vetSuggestions");
+    const vetIdInput = document.getElementById("vet_id");
+    let selectedVetId = {{ vet_id or 'null' }};
+    const vetName = '{{ vet_name or "" }}';
+    if (vetName) {
+      vetInput.value = vetName;
+    }
+
+    vetInput.addEventListener("input", async () => {
+      const query = vetInput.value.trim();
+      selectedVetId = null;
+      vetIdInput.value = "";
+
+      if (query.length < 0) {
+        vetSuggestions.innerHTML = "";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/autocomplete_users?q=${encodeURIComponent(query)}&role=${encodeURIComponent("Veterinarian")}`);
+        const vets = await response.json();
+
+        vetSuggestions.innerHTML = "";
+        vets.forEach(vet => {
+          const li = document.createElement("li");
+          li.className = "list-group-item list-group-item-action";
+          li.textContent = `${vet.full_name} - ${vet.specialization || 'General'} (${vet.email})`;
+          li.onclick = () => {
+            vetInput.value = vet.full_name;
+            selectedVetId = vet.vet_id;
+            vetIdInput.value = vet.vet_id;
+            vetSuggestions.innerHTML = "";
+          };
+          vetSuggestions.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error fetching veterinarians:', error);
+      }
+    });
+
+    // Validate vet selection on blur
+    vetInput.addEventListener('blur', function() {
+      setTimeout(() => {
+        if (!selectedVetId && vetInput.value.trim()) {
+          vetInput.value = '';
+          vetIdInput.value = "";
+        }
+      }, 200);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!vetSuggestions.contains(e.target) && e.target !== vetInput) {
+        vetSuggestions.innerHTML = "";
+      }
+    });
+
+    // Set minimum date to today
+    const dateInput = document.querySelector('input[name="appointment_date"]');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+  });
+</script>
+{% endblock %}

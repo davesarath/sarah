@@ -1,133 +1,136 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile - PetCare System</title>
+{% extends "layouts/admin_base.html" if session.role == "Admin" else "layouts/vet_base.html" if session.role == "Veterinarian" else "layouts/owner_base.html" %}
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+{% block title %}Pet Care Management - Profile{% endblock %}
 
-  <style>
-    body { background-color: #f8f9fa; }
-    .profile-card { max-width: 600px; margin: 50px auto; padding: 30px; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .profile-card img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; }
-  </style>
-</head>
-<body>
+{% block page_title %}User Profile{% endblock %}
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="#">PetCare System</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+{% block extra_css %}
+.profile-card { 
+  max-width: 600px; 
+  margin: 0 auto; 
+  padding: 30px; 
+  background: #fff; 
+  border-radius: 15px; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+}
+.profile-card img { 
+  width: 120px; 
+  height: 120px; 
+  object-fit: cover; 
+  border-radius: 50%; 
+  margin-bottom: 20px; 
+}
+{% endblock %}
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-house-door-fill"></i> Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="#"><i class="bi bi-person-circle"></i> Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-danger" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+{% block content %}
+<div class="profile-card text-center" id="profileCard">
+  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile Picture">
+  <h3 id="profileName">{{ objProfile.full_name }}</h3>
+  <p class="text-muted" id="profileRole">{{ objProfile.role }}</p>
+  <p><strong>Email:</strong> <span id="profileEmail">{{ objProfile.email }}</span></p>
+  <p><strong>Phone:</strong> <span id="profilePhone">{{ objProfile.phone or 'Not provided' }}</span></p>
+  <p id="addressInfo"><strong>Address:</strong> <span id="profileAddress">{{ objProfile.address or 'Not provided' }}</span></p>
+  <p id="specializationInfo" style="display: none;"><strong>Specialization:</strong> <span id="profileSpecialization">{{ objProfile.specialization or 'Not provided' }}</span></p>
+  <p><strong>Member Since:</strong> <span id="profileMember">{{ objProfile.created_at }}</span></p>
 
-  <!-- Profile Card -->
-  <div class="profile-card text-center" id="profileCard">
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile Picture">
-    <h3 id="profileName">Nancy Johnson</h3>
-    <p class="text-muted" id="profileRole">User</p>
-    <p><strong>Email:</strong> <span id="profileEmail">nancy@example.com</span></p>
-    <p><strong>Phone:</strong> <span id="profilePhone">+91 9876543210</span></p>
-    <p><strong>Member Since:</strong> <span id="profileMember">January 2025</span></p>
-
-    <div class="mt-4">
-      <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-        <i class="bi bi-pencil-square"></i> Edit Profile
-      </button>
-      <button class="btn btn-outline-danger" onclick="deleteAccount()">
-        <i class="bi bi-trash"></i> Delete Account
-      </button>
-    </div>
+  <div class="mt-4">
+    <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+      <i class="bi bi-pencil-square"></i> Edit Profile
+    </button>
+    <button class="btn btn-outline-danger" onclick="deleteAccount()">
+      <i class="bi bi-trash"></i> Delete Account
+    </button>
   </div>
+</div>
 
-  <!-- Edit Profile Modal -->
-  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title">Edit Profile</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editProfileForm">
-            <div class="mb-3">
-              <label for="editName" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="editName" required>
-            </div>
-            <div class="mb-3">
-              <label for="editEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="editEmail" required>
-            </div>
-            <div class="mb-3">
-              <label for="editPhone" class="form-label">Phone</label>
-              <input type="text" class="form-control" id="editPhone">
-            </div>
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary me-2"><i class="bi bi-check-circle"></i> Save Changes</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancel</button>
-            </div>
-          </form>
-        </div>
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Edit Profile</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProfileForm" action="/update_profile" method="POST">
+          <div class="mb-3">
+            <label for="editName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="editName" name="full_name" required>
+          </div>
+          <div class="mb-3" id="phoneField" style="display: none;">
+            <label for="editPhone" class="form-label">Phone</label>
+            <input type="number" class="form-control" id="editPhone" name="phone">
+          </div>
+          <div class="mb-3" id="addressField" style="display: none;">
+            <label for="editAddress" class="form-label">Address</label>
+            <input type="text" class="form-control" id="editAddress" name="address">
+          </div>
+          <div class="mb-3" id="specializationField" style="display: none;">
+            <label for="editSpecialization" class="form-label">Specialization</label>
+            <input type="text" class="form-control" id="editSpecialization" name="specialization">
+          </div>
+          <div class="mb-3">
+            <label for="editPassword" class="form-label">New Password (optional)</label>
+            <input type="password" class="form-control" id="editPassword" name="password" placeholder="Leave blank to keep current password">
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary me-2"><i class="bi bi-check-circle"></i> Save Changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Custom JS -->
-  <script>
-    // Pre-fill modal fields when opened
-    const editModal = document.getElementById('editProfileModal');
-    editModal.addEventListener('show.bs.modal', function () {
-      document.getElementById('editName').value = document.getElementById('profileName').innerText;
-      document.getElementById('editEmail').value = document.getElementById('profileEmail').innerText;
-      document.getElementById('editPhone').value = document.getElementById('profilePhone').innerText;
-    });
-
-    // Update profile card dynamically
-    const editForm = document.getElementById('editProfileForm');
-    editForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      document.getElementById('profileName').innerText = document.getElementById('editName').value;
-      document.getElementById('profileEmail').innerText = document.getElementById('editEmail').value;
-      document.getElementById('profilePhone').innerText = document.getElementById('editPhone').value;
-
-      // Close modal after saving
-      const modal = bootstrap.Modal.getInstance(editModal);
-      modal.hide();
-
-      alert('Profile updated successfully!');
-    });
-
-    function deleteAccount() {
-      if(confirm('Are you sure you want to delete your account?')) {
-        alert('Account deleted! (This is a demo)');
-      }
+{% block extra_js %}
+<script>
+  const userRole = '{{ objProfile.role }}';
+  
+  // Show role-specific fields
+  if (userRole === 'Pet Owner') {
+    document.getElementById('phoneField').style.display = 'block';
+    document.getElementById('addressField').style.display = 'block';
+  } else if (userRole === 'Veterinarian') {
+    document.getElementById('phoneField').style.display = 'block';
+    document.getElementById('addressField').style.display = 'block';
+    document.getElementById('specializationField').style.display = 'block';
+    document.getElementById('specializationInfo').style.display = 'block';
+  }
+  
+  // Pre-fill modal fields when opened
+  const editModal = document.getElementById('editProfileModal');
+  editModal.addEventListener('show.bs.modal', function () {
+    const objProfileDetails = {{ objProfile | tojson }};
+    document.getElementById('editName').value = objProfileDetails.full_name;
+    document.getElementById('editPhone').value = objProfileDetails.phone;
+    document.getElementById('editAddress').value = objProfileDetails.address;
+    if (userRole === 'Veterinarian') {
+      document.getElementById('editSpecialization').value = objProfileDetails.specialization;
     }
-  </script>
+  });
 
-</body>
-</html>
+  function deleteAccount() {
+    if(confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      fetch('/delete_account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        if (data.success) {
+          window.location.href = '/login';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the account.');
+      });
+    }
+  }
+</script>
+{% endblock %}
