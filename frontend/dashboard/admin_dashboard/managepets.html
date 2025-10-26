@@ -1,177 +1,461 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Pets - Pet Care System</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends "layouts/admin_base.html" if session.role == "Admin" else "layouts/owner_base.html" %}
 
-  
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="admin.html">Admin Dashboard</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-  </nav>
+{% block title %}Pet Care Management - Manage Pets{% endblock %}
 
-  
-  <div class="container mt-5">
-    <h2 class="mb-4 text-center">🐾 Manage Pets</h2>
+{% block page_title %}🐾 Manage Pets{% endblock %}
 
-    
-    <div class="d-flex justify-content-end mb-3">
-      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPetModal">
-        ➕ Add New Pet
-      </button>
-    </div>
+{% block extra_css %}
+#imagePreview {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+#imagePreview:hover {
+  border-color: #adb5bd;
+}
+#imagePreview img {
+  border-radius: 6px;
+}
+.form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+.list-group-item-action:hover {
+  background-color: #f8f9fa;
+}
+{% endblock %}
 
-    
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>#</th>
-              <th>Pet Name</th>
-              <th>Type</th>
-              <th>Breed</th>
-              <th>Age</th>
-              <th>Owner</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-       
-            <tr>
-              <td>1</td>
-              <td>Buddy</td>
-              <td>Dog</td>
-              <td>Golden Retriever</td>
-              <td>3 Years</td>
-              <td>John Doe</td>
-              <td>
-       <a href="javascript:void(0)" class="btn btn-primary btn-sm" 
-           onclick="viewPet('Buddy', 'Dog', 'Golden Retriever', '3 Years', 'John Doe')">View</a>
-        <a href="javascript:void(0)" class="btn btn-warning btn-sm" 
-           onclick="editPet(this)">Edit</a>
-        <a href="javascript:void(0)" class="btn btn-danger btn-sm" 
-           onclick="deletePet(this)">Delete</a>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Milo</td>
-              <td>Cat</td>
-              <td>Persian</td>
-              <td>2 Years</td>
-              <td>Jane Smith</td>
-              <td>
-              <a href="javascript:void(0)" class="btn btn-primary btn-sm" 
-           onclick="viewPet('Milo', 'Cat', 'Persian', '2 Years', 'Jane Smith')">View</a>
-                  <a href="javascript:void(0)" class="btn btn-warning btn-sm" 
-           onclick="editPet(this)">Edit</a>
-        <a href="javascript:void(0)" class="btn btn-danger btn-sm" 
-           onclick="deletePet(this)">Delete</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editPetModal" onclick="addPet()">
+    ➕ Add New Pet
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Pet Name</th>
+          <th>Breed</th>
+          <th>Age</th>
+          <th>Gender</th>
+          {% if session.role == "Admin" %}<th>Owner</th>{% endif %}
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pet in pets %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ pet.name }}</td>
+          <td>{{ pet.breed }}</td>
+          <td>{{ pet.age }}</td>
+          <td>{{ pet.gender }}</td>
+          {% if session.role == "Admin" %}<td>{{ pet.owner_name }}</td>{% endif %}
+          <td>
+            <a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick='viewPet({{ pet | tojson }})'>View</a>
+            <a href="javascript:void(0)" class="btn btn-warning btn-sm" onclick='editPet({{ pet | tojson }})'>Edit</a>
+            {% if session.role == "Admin" %}
+            <a href="javascript:void(0)" class="btn btn-danger btn-sm" onclick='deletePet({{ pet | tojson }})'>Delete</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+        
+        {% if not pets %}
+        <tr>
+          <td colspan="{{ '7' if session.role == 'Admin' else '6' }}" class="text-center text-muted">No pets added yet</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- EDIT PET MODAL -->
+<div class="modal fade" id="editPetModal" tabindex="-1" aria-labelledby="editPetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="pet-form" action="/manage_edit_pet" method="POST" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editPetModalLabel">✏️ Edit Pet</h5>
+          <h5 class="modal-title" id="addPetModalLabel">✏️ Add Pet</h5>
+          <h5 class="modal-title" id="viewPetModalLabel">👁️ View Pet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" id="edit_pet_id" name="pet_id">
+          <input type="hidden" id="edit_owner_id" name="owner_id">
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Pet Name</label>
+                <input type="text" class="form-control" id="pet_name" name="name" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Breed</label>
+                <input type="text" class="form-control" id="pet_breed" name="breed" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control" id="pet_age" name="age" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Gender</label>
+                <div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="gender_male" value="Male" required>
+                    <label class="form-check-label" for="gender_male">Male</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="gender_female" value="Female" required>
+                    <label class="form-check-label" for="gender_female">Female</label>
+                  </div>
+                </div>
+              </div>
+
+              {% if session.role == "Admin" %}
+              <div class="mb-3" id="owner-field">
+                <label class="form-label">Owner <span class="text-danger">*</span></label>
+                <input type="text" id="userSearch" class="form-control" placeholder="Enter owner name..." autocomplete="off" required>
+                <ul id="suggestions" class="list-group position-absolute w-100" style="z-index:1000;"></ul>
+                <div class="invalid-feedback">Please select a valid owner from the list.</div>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Medical History</label>
+                <textarea class="form-control" id="pet_medical_history" name="medical_history" rows="4" placeholder="Enter medical history..."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Pet Image</label>
+                <input type="file" class="form-control" id="pet_image" name="image" accept="image/*" onchange="previewImage(event)">
+                <small class="form-text text-muted">Supported formats: PNG, JPG, JPEG, GIF (Max 5MB)</small>
+                <div id="file-error" class="text-danger mt-1" style="display: none;"></div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Image Preview</label>
+                <div id="imagePreview" class="border rounded p-2" style="min-height: 150px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                  <span class="text-muted">No image selected</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-pet-close" onclick="setPetFormDefault()" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="btn-pet-submit" class="btn btn-primary" onclick="return validateForm()">Save</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+{% endblock %}
 
- 
-  <div class="modal fade" id="addPetModal" tabindex="-1" aria-labelledby="addPetModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form>
-          <div class="modal-header">
-            <h5 class="modal-title" id="addPetModalLabel">➕ Add New Pet</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Pet Name</label>
-              <input type="text" class="form-control" placeholder="Enter pet name">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Type</label>
-              <select class="form-select">
-                <option selected disabled>Select type</option>
-                <option>Dog</option>
-                <option>Cat</option>
-                <option>Bird</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Breed</label>
-              <input type="text" class="form-control" placeholder="Enter breed">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Age</label>
-              <input type="text" class="form-control" placeholder="Enter age">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Owner</label>
-              <input type="text" class="form-control" placeholder="Enter owner name">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-success">Save Pet</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-
-  <footer class="bg-dark text-white text-center p-3 mt-5">
-    <p>&copy; 2025 Pet Care Management System. All Rights Reserved.</p>
-  </footer>
-   <script>
-function viewPet(name, type, breed, age, owner) {
-  alert(
-    "Pet Details:\n" +
-    "Name: " + name + "\n" +
-    "Type: " + type + "\n" +
-    "Breed: " + breed + "\n" +
-    "Age: " + age + "\n" +
-    "Owner: " + owner
-  );
-}
-
-function editPet(button) {
-  const row = button.closest("tr");
-  const name = prompt("Edit Pet Name:", row.cells[1].innerText);
-  const type = prompt("Edit Type:", row.cells[2].innerText);
-  const breed = prompt("Edit Breed:", row.cells[3].innerText);
-  const age = prompt("Edit Age:", row.cells[4].innerText);
-  const owner = prompt("Edit Owner:", row.cells[5].innerText);
-
-  if (name && type && breed && age && owner) {
-    row.cells[1].innerText = name;
-    row.cells[2].innerText = type;
-    row.cells[3].innerText = breed;
-    row.cells[4].innerText = age;
-    row.cells[5].innerText = owner;
+{% block extra_js %}
+<script>
+  // Hide owner field for Pet Owner role
+  const userRole = '{{ session.role }}';
+  if (userRole === 'Pet Owner') {
+    const ownerField = document.getElementById('owner-field');
+    if (ownerField) {
+      ownerField.style.display = 'none';
+      document.getElementById('userSearch').removeAttribute('required');
+    }
   }
-}
+  
+  function viewPet(objPet) {
+    // Fill modal inputs
+    document.getElementById("edit_pet_id").value = objPet.pet_id || "";
+    document.getElementById("edit_owner_id").value = objPet.owner_id || "";
+    document.getElementById("pet_name").value = objPet.name || "";
+    document.getElementById("pet_breed").value = objPet.breed || "";
+    document.getElementById("pet_age").value = objPet.age || "";
+    document.getElementById("pet_medical_history").value = objPet.medical_history || "";
+    const userSearchInput = document.getElementById("userSearch");
+    if (userSearchInput) {
+      userSearchInput.value = objPet.owner_name || "";
+    }
+    
+    // Set gender radio button
+    if (objPet.gender === 'Male') {
+      document.getElementById("gender_male").checked = true;
+    } else if (objPet.gender === 'Female') {
+      document.getElementById("gender_female").checked = true;
+    }
 
-function deletePet(button) {
-  if (confirm("Are you sure you want to delete this record?")) {
-    button.closest("tr").remove();
+    // Show existing image if available
+    const imagePreview = document.getElementById("imagePreview");
+    if (objPet.image) {
+      imagePreview.innerHTML = `<img src="/static/${objPet.image}" alt="Pet Image" style="max-width: 100%; max-height: 150px; object-fit: contain;">`;
+    } else {
+      imagePreview.innerHTML = '<span class="text-muted">No image available</span>';
+    }
+
+    // Hide submit button and file input for view mode
+    document.getElementById("btn-pet-submit").style.display = "none";
+    document.getElementById("pet_image").style.display = "none";
+    document.getElementById("editPetModalLabel").style.display = "none";
+    document.getElementById("addPetModalLabel").style.display = "none";
+    document.getElementById("viewPetModalLabel").style.display = "block";
+
+    // Disable all inputs
+    const inputs = document.querySelectorAll('#pet-form input, #pet-form textarea');
+    inputs.forEach(input => input.disabled = true);
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editPetModal"));
+    modal.show();
   }
-}
+
+  function editPet(objPet) {
+    // Fill modal inputs
+    document.getElementById("edit_pet_id").value = objPet.pet_id || "";
+    document.getElementById("edit_owner_id").value = objPet.owner_id || "";
+    document.getElementById("pet_name").value = objPet.name || "";
+    document.getElementById("pet_breed").value = objPet.breed || "";
+    document.getElementById("pet_age").value = objPet.age || "";
+    document.getElementById("pet_medical_history").value = objPet.medical_history || "";
+    const userSearchInput = document.getElementById("userSearch");
+    if (userSearchInput) {
+      userSearchInput.value = objPet.owner_name || "";
+    }
+    
+    // Set gender radio button
+    if (objPet.gender === 'Male') {
+      document.getElementById("gender_male").checked = true;
+    } else if (objPet.gender === 'Female') {
+      document.getElementById("gender_female").checked = true;
+    }
+
+    // Show existing image if available
+    const imagePreview = document.getElementById("imagePreview");
+    if (objPet.image) {
+      imagePreview.innerHTML = `<img src="/static/${objPet.image}" alt="Pet Image" style="max-width: 100%; max-height: 150px; object-fit: contain;">`;
+    } else {
+      imagePreview.innerHTML = '<span class="text-muted">No image selected</span>';
+    }
+
+    document.getElementById("editPetModalLabel").style.display = "block";
+    document.getElementById("addPetModalLabel").style.display = "none";
+    document.getElementById("viewPetModalLabel").style.display = "none";
+    document.getElementById("btn-pet-submit").style.display = "block";
+    document.getElementById("btn-pet-submit").innerText = "Update";
+    document.getElementById("pet-form").action = "/manage_edit_pet";
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editPetModal"));
+    modal.show();
+  }
+
+  function addPet() {
+    // Clear all inputs
+    document.getElementById("edit_pet_id").value = "";
+    document.getElementById("edit_owner_id").value = "";
+    document.getElementById("pet_name").value = "";
+    document.getElementById("pet_breed").value = "";
+    document.getElementById("pet_age").value = "";
+    document.getElementById("pet_medical_history").value = "";
+    const userSearchInput = document.getElementById("userSearch");
+    if (userSearchInput) {
+      userSearchInput.value = "";
+    }
+    document.getElementById("pet_image").value = "";
+    
+    // Set male as default gender
+    document.getElementById("gender_male").checked = true;
+    document.getElementById("gender_female").checked = false;
+    
+    // Clear image preview
+    document.getElementById("imagePreview").innerHTML = '<span class="text-muted">No image selected</span>';
+
+    document.getElementById("editPetModalLabel").style.display = "none";
+    document.getElementById("addPetModalLabel").style.display = "block";
+    document.getElementById("viewPetModalLabel").style.display = "none";
+    document.getElementById("btn-pet-submit").style.display = "block";
+    document.getElementById("btn-pet-submit").innerText = "Save";
+    document.getElementById("pet-form").action = "/manage_add_pet";
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editPetModal"));
+    modal.show();
+  }
+
+  function setPetFormDefault() {
+    // Enable all inputs
+    const inputs = document.querySelectorAll('#pet-form input, #pet-form textarea');
+    inputs.forEach(input => input.disabled = false);
+    
+    // Show file input
+    document.getElementById("pet_image").style.display = "block";
+    
+    // Remove modal backdrop
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('padding-right');
+  }
+
+  function deletePet(objPet) {
+    if (confirm("Are you sure you want to delete " + objPet.name + "?")) {
+      // Send a DELETE request using fetch
+      fetch("/manage_delete_pet", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ pet_id: objPet.pet_id })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message || "Pet deleted successfully");
+        location.reload(); // Refresh page after delete
+      })
+      .catch(err => console.error(err));
+    }
+  }
+
+  function previewImage(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('imagePreview');
+    const errorDiv = document.getElementById('file-error');
+    
+    if (file) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      if (file.size > 5 * 1024 * 1024) {
+        errorDiv.textContent = 'File size must not exceed 5MB';
+        errorDiv.style.display = 'block';
+        event.target.value = '';
+        preview.innerHTML = '<span class="text-muted">No image selected</span>';
+        return;
+      }
+      
+      // Check file type
+      const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        errorDiv.textContent = 'Only PNG, JPG, JPEG, and GIF files are allowed';
+        errorDiv.style.display = 'block';
+        event.target.value = '';
+        preview.innerHTML = '<span class="text-muted">No image selected</span>';
+        return;
+      }
+      
+      errorDiv.style.display = 'none';
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 150px; object-fit: contain;">`;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      errorDiv.style.display = 'none';
+      preview.innerHTML = '<span class="text-muted">No image selected</span>';
+    }
+  }
+  
+  function validateForm() {
+    const ownerInput = document.getElementById('userSearch');
+    const ownerId = document.getElementById('edit_owner_id').value;
+    
+    if (ownerInput && !ownerId && ownerInput.value.trim()) {
+      ownerInput.classList.add('is-invalid');
+      alert('Please select a valid owner from the dropdown list.');
+      return false;
+    }
+    
+    const userRole = '{{ session.role }}';
+    if (userRole != 'Pet Owner' && ownerInput && !ownerInput.value.trim()) {
+      ownerInput.classList.add('is-invalid');
+      alert('Owner is required.');
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Handle modal backdrop cleanup
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('editPetModal');
+    modal.addEventListener('hidden.bs.modal', function() {
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+    });
+    
+    const userInput = document.getElementById("userSearch");
+    const suggestionsList = document.getElementById("suggestions");
+    
+    if (userInput && suggestionsList) {
+      let selectedOwnerId = null;
+      
+      userInput.addEventListener("keyup", async () => {
+        const query = userInput.value.trim();
+        selectedOwnerId = null;
+        document.getElementById("edit_owner_id").value = "";
+        
+        if (query.length < 0) { 
+          suggestionsList.innerHTML = ""; 
+          return;
+        }
+
+        try {
+          const response = await fetch(`/autocomplete_users?q=${encodeURIComponent(query)}&role=${encodeURIComponent("Pet Owner")}`);
+          const users = await response.json();
+          
+          suggestionsList.innerHTML = "";
+          users.forEach(user => {
+            const li = document.createElement("li");
+            li.className = "list-group-item list-group-item-action";
+            li.textContent = `${user.full_name} (${user.email})`;
+            li.onclick = () => {
+              userInput.value = user.full_name;
+              selectedOwnerId = user.user_id;
+              document.getElementById("edit_owner_id").value = user.user_id;
+              suggestionsList.innerHTML = "";
+              userInput.classList.remove('is-invalid');
+            };
+            suggestionsList.appendChild(li);
+          });
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        }
+      });
+      
+      // Validate owner selection on blur
+      userInput.addEventListener('blur', function() {
+        setTimeout(() => {
+          if (!selectedOwnerId && userInput.value.trim()) {
+            userInput.value = '';
+            document.getElementById("edit_owner_id").value = "";
+            userInput.classList.add('is-invalid');
+          }
+        }, 200);
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!suggestionsList.contains(e.target) && e.target !== userInput) {
+          suggestionsList.innerHTML = "";
+        }
+      });
+    }
+  });
 </script>
-
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

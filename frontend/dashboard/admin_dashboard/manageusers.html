@@ -1,201 +1,245 @@
+{% extends "layouts/admin_base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Users - Pet Care System</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% block title %}Pet Care Management - Manage Users{% endblock %}
 
-  
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="admin.html">Admin Dashboard</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-  </nav>
+{% block page_title %}👥 Manage Users{% endblock %}
 
-  
-  <div class="container mt-5">
-    <h2 class="mb-4 text-center">👥 Manage Users</h2>
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editUserModal" onclick="addUser()">
+    ➕ Add New User
+  </button>
+</div>
 
-  
-    <div class="d-flex justify-content-end mb-3">
-      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
-        ➕ Add New User
-      </button>
-    </div>
+<div class="card">
+  <div class="card-body">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.status }}</td>
+          <td>
+            <a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick='viewUser({{ user | tojson }})'>View</a>
+            <a href="javascript:void(0)" class="btn btn-warning btn-sm" onclick='editUser({{ user | tojson }})'>Edit</a>
+            <a href="javascript:void(0)" class="btn btn-danger btn-sm" onclick='deleteUser({{ user | tojson }})'>Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+        
+        {% if not users %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No users added yet</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-  
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-           {% for user in users %}
+<!-- EDIT USER MODAL -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="user-form" action="/manage_edit_user" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserModalLabel">✏️ Edit User</h5>
+          <h5 class="modal-title" id="addUserModalLabel">✏️ Add User</h5>
+          <h5 class="modal-title" id="userUserModalLabel">👁️ View User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
 
-            <tr>
-              <td>{{ user.user_id }}</td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.role }}</td>
-              <td>{{ user.status }}</td>
-              <td>
-                <a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick="viewUser('{{ user.user_id }}', '{{ user.username }}', '{{ user.email }}', '{{ user.role }}')">View</a>
-                  <a href="javascript:void(0)" class="btn btn-warning btn-sm" onclick="editUser(this)">Edit</a>
-                 <a href="javascript:void(0)" class="btn btn-danger btn-sm" onclick="deleteUser('{{ user.username }}')">Delete</a>
-              </td>
-            </tr>
-            {% endfor %}
+        <div class="modal-body">
+          <input type="hidden" id="edit_user_id" name="user_id">
 
-         <!--   <tr>
-              <td>1</td>
-              <td>John Doe</td>
-              <td>john@example.com</td>
-              <td>Pet Owner</td>
-              <td><span class="badge bg-success">Active</span></td>
-              <td>
-                 <a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick="viewUser('John Doe', 'john@example.com', 'Admin', 'Active')">View</a>
-                  <a href="javascript:void(0)" class="btn btn-warning btn-sm" onclick="editUser(this)">Edit</a>
-                 <a href="javascript:void(0)" class="btn btn-danger btn-sm" onclick="deleteUser('John Doe')">Delete</a>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Dr. Emily Smith</td>
-              <td>emily@vetcare.com</td>
-              <td>Veterinarian</td>
-              <td><span class="badge bg-secondary">Inactive</span></td>
-              <td>
-                <a href="#" class="btn btn-primary btn-sm">View</a>
-                <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                <a href="#" class="btn btn-danger btn-sm">Delete</a>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Admin User</td>
-              <td>admin@petcare.com</td>
-              <td>Admin</td>
-              <td><span class="badge bg-success">Active</span></td>
-              <td>
-                <a href="#" class="btn btn-primary btn-sm">View</a>
-                <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                <a href="#" class="btn btn-danger btn-sm">Delete</a>
-              </td>
-            </tr> -->
-          </tbody>
-        </table>
-      </div>
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="full_name" name="full_name" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="edit_email" name="email" required readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="number" class="form-control" id="edit_phone" name="phone">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Specialization</label>
+            <input type="text" class="form-control" id="edit_specialization" name="specialization">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control" id="edit_address" name="address">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select class="form-select" id="edit_role" name="role" required>
+              <option>Admin</option>
+              <option>Veterinarian</option>
+              <option>Pet Owner</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="edit_status" name="status" required>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+
+          <div class="mb-3" id="password-grp">
+            <label class="form-label">Password (leave blank to keep current)</label>
+            <input type="password" class="form-control" id="edit_password" name="password"
+              placeholder="Enter new password (optional)">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-user-close" onclick="setUserFormDefault()" class="btn btn-secondary"
+            data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="btn-user-submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+{% endblock %}
 
-  
-  <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form action="/manage_users" method="POST">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addUserModalLabel">➕ Add New User</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Full Name</label>
-              <input type="text" class="form-control" name = "fullname" required placeholder="Enter full name">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" name = "email" required placeholder="Enter email">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Role</label>
-              <select class="form-select" name = "role" required>
-                <option selected disabled>Select role</option>
-                <option>Admin</option>
-                <option>Veterinarian</option>
-                <option>Pet Owner</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Status</label>
-              <select class="form-select" name = "status" required>
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password</label>
-              <input type="password" class="form-control" name = "password" required placeholder="Enter password">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-success">Save User</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+{% block extra_js %}
+<script>
+  function viewUser(objUser) {
+    // Fill modal inputs
+    document.getElementById("edit_user_id").value = objUser.user_id;
+    document.getElementById("full_name").value = objUser.full_name;
+    document.getElementById("edit_email").value = objUser.email;
+    document.getElementById("edit_role").value = objUser.role;
+    document.getElementById("edit_status").value = objUser.status;
+    document.getElementById("edit_address").value = objUser.address;
+    document.getElementById("edit_phone").value = objUser.phone;
+    document.getElementById("edit_specialization").value = objUser.specialization;
+    document.getElementById("edit_password").value = "";
 
-  
-  <footer class="bg-dark text-white text-center p-3 mt-5">
-    <p>&copy; 2025 Pet Care Management System. All Rights Reserved.</p>
-  </footer>
-  <script>
-   function viewUser(name, email, role, status) {
-    alert(
-      "User Details:\n" +
-      "Name: " + name + "\n" +
-      "Email: " + email + "\n" +
-      "Role: " + role + "\n" +
-      "Status: " + status
-    );
+    document.getElementById("password-grp").style.display = "none";
+    document.getElementById("btn-user-submit").style.display = "none";
+    document.getElementById("editUserModalLabel").style.display = "none";
+    document.getElementById("addUserModalLabel").style.display = "none";
+    document.getElementById("userUserModalLabel").style.display = "block";
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editUserModal"));
+    modal.show();
   }
 
-  function editUser(button) {
-   
-    let row = button.parentElement.parentElement;
-    
-   
-    let name = row.cells[1].innerText;
-    let role = row.cells[3].innerText;
-    let status = row.cells[4].innerText;
+  function editUser(objUser) {
+    // Fill modal inputs
+    document.getElementById("edit_user_id").value = objUser.user_id;
+    document.getElementById("full_name").value = objUser.full_name;
+    document.getElementById("edit_email").value = objUser.email;
+    document.getElementById("edit_address").value = objUser.address;
+    document.getElementById("edit_phone").value = objUser.phone;
+    document.getElementById("edit_specialization").value = objUser.specialization;
+    document.getElementById("edit_role").value = objUser.role;
+    document.getElementById("edit_status").value = objUser.status;
+    document.getElementById("edit_password").value = "";
+    document.getElementById("password-grp").style.display = "block";
 
-    
-    let newName = prompt("Edit Name:", name);
-    let newRole = prompt("Edit Role (Admin/User):", role);
-    let newStatus = prompt("Edit Status (Active/Inactive):", status);
+    document.getElementById("editUserModalLabel").style.display = "block";
+    document.getElementById("addUserModalLabel").style.display = "none";
+    document.getElementById("userUserModalLabel").style.display = "none";
+    document.getElementById("btn-user-submit").style.display = "block";
+    document.getElementById("btn-user-submit").innerText = "Update";
+    document.getElementById("user-form").action = "/manage_edit_user";
 
-    
-    if(newName) row.cells[1].innerText = newName;
-    if(newRole) row.cells[3].innerText = newRole;
-    if(newStatus) row.cells[4].innerText = newStatus;
-
-    alert("User updated! (simulated)");
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editUserModal"));
+    modal.show();
   }
 
-  function deleteUser(name) {
-    if(confirm("Are you sure you want to delete " + name + "?")) {
-      alert(name + " deleted! (simulated)");
+  function addUser() {
+    // Fill modal inputs
+    document.getElementById("edit_user_id").value = "";
+    document.getElementById("full_name").value = "";
+    document.getElementById("edit_email").value = "";
+    document.getElementById("edit_address").value = "";
+    document.getElementById("edit_phone").value = "";
+    document.getElementById("edit_specialization").value = "";
+    document.getElementById("edit_role").value = "";
+    document.getElementById("edit_status").value = "";
+    document.getElementById("edit_password").value = "";
+    document.getElementById("password-grp").style.display = "block";
+
+    document.getElementById("editUserModalLabel").style.display = "none";
+    document.getElementById("addUserModalLabel").style.display = "block";
+    document.getElementById("userUserModalLabel").style.display = "none";
+    document.getElementById("btn-user-submit").style.display = "block";
+    document.getElementById("btn-user-submit").innerText = "Save";
+    document.getElementById("user-form").action = "/manage_add_user";
+    const emailInput = document.getElementById("edit_email");
+
+    if (emailInput.hasAttribute("readonly")) {
+      // Make editable
+      emailInput.removeAttribute("readonly");
+    }
+    const passwordInput = document.getElementById("edit_password");
+    passwordInput.setAttribute("required", true);
+    passwordInput.placeholder = "";
+    document.getElementById("password-grp").getElementsByTagName("label")[0].innerText = "Password"
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editUserModal"));
+    modal.show();
+  }
+
+  function setUserFormDefault() {
+    const emailInput = document.getElementById("edit_email");
+
+    if (!emailInput.hasAttribute("readonly")) {
+      emailInput.setAttribute("readonly", true);
+    }
+    const passwordInput = document.getElementById("edit_password");
+
+    if (passwordInput.hasAttribute("required")) {
+      passwordInput.removeAttribute("required");
+    }
+    passwordInput.placeholder = "Enter new password (optional)";
+    const passwordLabel = document.getElementById("password-grp").getElementsByTagName("label")[0];
+    passwordLabel.innerText = "Password (leave blank to keep current)"
+  }
+
+  function deleteUser(objUser) {
+    if (confirm("Are you sure you want to delete " + objUser.full_name + "?")) {
+      // Send a DELETE request using fetch
+      fetch("/manage_delete_user", {
+        method: "DELETE", 
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ user_id: objUser.user_id })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message || "User deleted successfully");
+        location.reload(); // Refresh page after delete
+      })
+      .catch(err => console.error(err));
     }
   }
 </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Pet Care Management - Medical Records{% endblock %}
+
+{% block page_title %}Medical Records{% endblock %}
+
+{% block content %}
+<!-- Vaccinations Section -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0"><i class="bi bi-shield-check text-success me-2"></i>Vaccinations</h5>
+  </div>
+  <div class="card-body">
+    {% if vaccinations|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Pet</th>
+            <th>Owner</th>
+            <th>Vaccine</th>
+            <th>Veterinarian</th>
+            <th>Date Given</th>
+            <th>Next Due</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vaccination in vaccinations %}
+          <tr>
+            <td>{{ vaccination.pet_name }}</td>
+            <td>{{ vaccination.owner_name }}</td>
+            <td>{{ vaccination.vaccine_name }}</td>
+            <td>{{ vaccination.vet_name }}</td>
+            <td>{{ vaccination.date_given.strftime('%d %b %Y') }}</td>
+            <td>
+              {% if vaccination.next_due_date %}
+                {{ vaccination.next_due_date.strftime('%d %b %Y') }}
+              {% else %}
+                <span class="text-muted">Not set</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No vaccination records found.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Medications Section -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0"><i class="bi bi-capsule text-primary me-2"></i>Medications</h5>
+  </div>
+  <div class="card-body">
+    {% if medications|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Pet</th>
+            <th>Owner</th>
+            <th>Medicine</th>
+            <th>Dosage</th>
+            <th>Veterinarian</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for medication in medications %}
+          <tr>
+            <td>{{ medication.pet_name }}</td>
+            <td>{{ medication.owner_name }}</td>
+            <td>{{ medication.medicine_name }}</td>
+            <td>{{ medication.dosage }}</td>
+            <td>{{ medication.vet_name }}</td>
+            <td>{{ medication.start_date.strftime('%d %b %Y') }}</td>
+            <td>
+              {% if medication.end_date %}
+                {{ medication.end_date.strftime('%d %b %Y') }}
+              {% else %}
+                <span class="text-muted">Ongoing</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No medication records found.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
