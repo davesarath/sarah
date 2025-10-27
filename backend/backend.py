@@ -1272,6 +1272,62 @@ def cancel_appointment():
         cursor.close()
         conn.close()
 
+@app.route("/upcoming_reminders")
+@role_required("Pet Owner")
+def upcoming_reminders():
+    conn = get_conn()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        user_id = session["user_id"]
+        
+        # Get upcoming vaccinations (next due dates)
+        cursor.execute("""
+            SELECT v.*, p.name as pet_name, p.breed, u.full_name as vet_name
+            FROM vaccinations v
+            JOIN pets p ON v.pet_id = p.pet_id
+            JOIN owners o ON p.owner_id = o.owner_id
+            JOIN veterinarians vet ON v.vet_id = vet.vet_id
+            JOIN users u ON vet.user_id = u.user_id
+            WHERE o.user_id = %s AND v.next_due_date >= CURDATE()
+            ORDER BY v.next_due_date ASC
+        """, (user_id,))
+        upcoming_vaccinations = cursor.fetchall()
+        
+        # Get active medications (not yet ended)
+        cursor.execute("""
+            SELECT m.*, p.name as pet_name, p.breed, u.full_name as vet_name
+            FROM medications m
+            JOIN pets p ON m.pet_id = p.pet_id
+            JOIN owners o ON p.owner_id = o.owner_id
+            JOIN veterinarians vet ON m.vet_id = vet.vet_id
+            JOIN users u ON vet.user_id = u.user_id
+            WHERE o.user_id = %s AND (m.end_date IS NULL OR m.end_date >= CURDATE())
+            ORDER BY m.end_date ASC
+        """, (user_id,))
+        active_medications = cursor.fetchall()
+        
+        # Get upcoming appointments
+        cursor.execute("""
+            SELECT a.*, p.name as pet_name, p.breed, u.full_name as vet_name, vet.clinic_address
+            FROM appointments a
+            JOIN pets p ON a.pet_id = p.pet_id
+            JOIN owners o ON a.owner_id = o.owner_id
+            JOIN veterinarians vet ON a.vet_id = vet.vet_id
+            JOIN users u ON vet.user_id = u.user_id
+            WHERE o.user_id = %s AND a.appointment_date >= NOW() AND a.status != 'Cancelled'
+            ORDER BY a.appointment_date ASC
+        """, (user_id,))
+        upcoming_appointments = cursor.fetchall()
+        
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return render_template("notifications/upcoming.html", 
+                         upcoming_vaccinations=upcoming_vaccinations,
+                         active_medications=active_medications,
+                         upcoming_appointments=upcoming_appointments)
+
 @app.route("/autocomplete_users", methods=["GET"])
 def autocomplete_users():
     role = request.args.get("role", "")

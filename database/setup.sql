@@ -26,7 +26,7 @@ CREATE TABLE pets (
     age INT,
     gender ENUM('Male','Female'),
     medical_history TEXT,
-    image text DEFAULT "",
+    image text,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_id) REFERENCES owners(owner_id)
 );
